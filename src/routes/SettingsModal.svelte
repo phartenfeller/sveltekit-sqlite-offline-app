@@ -1,4 +1,5 @@
 <script lang="ts">
+	import OpfsExplorer from '$lib/components/opfs-explorer.svelte';
 	import Logger, { type LogLevel } from '$lib/logger';
 	import {
 		Dialog,
@@ -48,7 +49,7 @@
 					leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
 				>
 					<div
-						class="relative transform overflow-hidden min-w-[480px] rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6"
+						class="relative transform overflow-hidden min-w-[700px] rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6"
 					>
 						<div class="flex justify-between items-center">
 							<DialogTitle
@@ -106,6 +107,10 @@
 									{/each}
 								</div>
 							</fieldset>
+						</div>
+
+						<div class="mt-4">
+							<OpfsExplorer />
 						</div>
 					</div>
 				</TransitionChild>
