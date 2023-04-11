@@ -1,3 +1,4 @@
+import initStorages from './initStorages';
 import { initMsgBus, sendMsgToWorker } from './messageBus';
 import { WorkerMessageTypes } from './types';
 
@@ -15,4 +16,6 @@ export default async function initWorker() {
 	});
 
 	console.log('Init worker response:', res);
+
+	initStorages();
 }

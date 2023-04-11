@@ -1,6 +1,7 @@
 /* eslint-disable no-case-declarations */
-import { WorkerMessageTypes, type WorkerMessage } from '../types';
+import { WorkerMessageTypes, type WorkerMessage, type TableExistsResponseData } from '../types';
 import { initDb } from './initDb';
+import { handleTableExists } from './storageHandlers';
 
 console.log('worker loaded');
 
@@ -27,6 +28,18 @@ function sendMsgToMain(obj: WorkerMessage<unknown>) {
 				};
 				sendMsgToMain(initResult);
 
+				break;
+
+			case WorkerMessageTypes.TABLE_EXISTS:
+				const tableExistData = handleTableExists(data);
+
+				const tableExistsResult: WorkerMessage<TableExistsResponseData> = {
+					type: WorkerMessageTypes.TABLE_EXISTS_RESPONSE,
+					messageId: data.messageId,
+					storageId: data.storageId,
+					data: tableExistData
+				};
+				sendMsgToMain(tableExistsResult);
 				break;
 
 			default:
