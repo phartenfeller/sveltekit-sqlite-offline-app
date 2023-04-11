@@ -4,11 +4,13 @@ import { initDb } from './initDb';
 
 console.log('worker loaded');
 
-(async function () {
-	addEventListener('message', async function ({ data }: { data: WorkerMessage }) {
-		console.log('worker received message:', data.type);
+function sendMsgToMain(obj: WorkerMessage<unknown>) {
+	postMessage(obj);
+}
 
-		let res: WorkerMessage;
+(async function () {
+	addEventListener('message', async function ({ data }: { data: WorkerMessage<unknown> }) {
+		console.log('worker received message:', data.type);
 
 		switch (data.type) {
 			case WorkerMessageTypes.INIT_DB:
@@ -16,9 +18,15 @@ console.log('worker loaded');
 
 				const initRes = await initDb();
 				console.log('worker initDb result:', initRes);
-				res = { type: WorkerMessageTypes.INIT_DB_RESPONSE };
-				console.log('worker sending message back to main:', res);
-				this.postMessage(res);
+
+				const initResult: WorkerMessage<undefined> = {
+					type: WorkerMessageTypes.INIT_DB_RESPONSE,
+					messageId: data.messageId,
+					storageId: data.storageId,
+					data: undefined
+				};
+				sendMsgToMain(initResult);
+
 				break;
 
 			default:
