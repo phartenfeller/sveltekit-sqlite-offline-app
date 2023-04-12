@@ -13,9 +13,7 @@ export function tableExists(table: string) {
 export function tableHasData(table: string) {
 	const sql = `SELECT count(*) as "cnt" FROM ${table}`;
 
-	const res = db.selectObject(sql, {
-		$table: table
-	}) as { cnt: number };
+	const res = db.selectObject(sql) as { cnt: number };
 
 	return res.cnt > 0;
 }

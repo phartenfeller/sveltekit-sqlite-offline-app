@@ -1,6 +1,8 @@
+export type ColType = 'string' | 'number';
+
 export type ColumnInfo = {
 	name: string;
-	type: 'string' | 'number';
+	type: ColType;
 };
 
 export type TableStructure = {

@@ -1,7 +1,13 @@
 /* eslint-disable no-case-declarations */
-import { WorkerMessageTypes, type WorkerMessage, type TableExistsResponseData } from '../types';
+import {
+	WorkerMessageTypes,
+	type WorkerMessage,
+	type TableExistsResponseData,
+	type CreateTableResponseData,
+	type CreateTableRequestData
+} from '../types';
 import { initDb } from './initDb';
-import { handleTableExists } from './storageHandlers';
+import { handleCreateTable, handleTableExists } from './storageHandlers';
 
 console.log('worker loaded');
 
@@ -11,7 +17,7 @@ function sendMsgToMain(obj: WorkerMessage<unknown>) {
 
 (async function () {
 	addEventListener('message', async function ({ data }: { data: WorkerMessage<unknown> }) {
-		console.log('worker received message:', data.type);
+		console.log('worker received message:', data);
 
 		switch (data.type) {
 			case WorkerMessageTypes.INIT_DB:
@@ -42,6 +48,19 @@ function sendMsgToMain(obj: WorkerMessage<unknown>) {
 				sendMsgToMain(tableExistsResult);
 				break;
 
+			case WorkerMessageTypes.CREATE_TABLE:
+				const createTableData = await handleCreateTable(
+					data as WorkerMessage<CreateTableRequestData>
+				);
+
+				const createTableResult: WorkerMessage<CreateTableResponseData> = {
+					type: WorkerMessageTypes.CREATE_TABLE_RESPONSE,
+					messageId: data.messageId,
+					storageId: data.storageId,
+					data: createTableData
+				};
+				sendMsgToMain(createTableResult);
+				break;
 			default:
 				throw new Error(`Unknown message type: ${data.type}`);
 		}

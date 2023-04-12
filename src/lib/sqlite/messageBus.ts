@@ -1,4 +1,4 @@
-import type { WorkerMessage, WorkerMessageBase, WorkerMessageTypes } from './types';
+import type { WorkerMessage, WorkerMessageTypes } from './types';
 
 export type WorkerMsgCb = (data: WorkerMessage<unknown>) => unknown;
 const cbMap = new Map<string, WorkerMsgCb>();
@@ -68,9 +68,9 @@ export function sendMsgToWorker({
 			cb
 		});
 
-		const msgData: WorkerMessageBase = { messageId, storageId, type };
+		const msgData = <WorkerMessage<unknown>>{ messageId, storageId, type };
 		if (typeof data == 'object') {
-			Object.assign(msgData, data);
+			msgData.data = data;
 		}
 
 		worker.postMessage(msgData);

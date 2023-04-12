@@ -1,4 +1,11 @@
-import type { TableExistsResponseData, WorkerMessage } from '../types';
+import type {
+	CreateTableRequestData,
+	CreateTableResponseData,
+	TableExistsResponseData,
+	WorkerMessage
+} from '../types';
+import { db } from './initDb';
+import genTabSrc from './util/genTabSrc';
 import { tableExists, tableHasData } from './util/tableInfo';
 
 export function handleTableExists(data: WorkerMessage<unknown>): TableExistsResponseData {
@@ -22,6 +29,26 @@ export function handleTableExists(data: WorkerMessage<unknown>): TableExistsResp
 		return {
 			tableExists: false,
 			hasData: false,
+			errorMsg: msg
+		};
+	}
+}
+
+export function handleCreateTable(
+	msg: WorkerMessage<CreateTableRequestData>
+): CreateTableResponseData {
+	try {
+		const src = genTabSrc(msg.storageId, msg.data.structure);
+		console.log('Creating table:', src);
+
+		db.exec(src);
+
+		return {};
+	} catch (err) {
+		const msg = `Error creating table: ${err}`;
+		console.error(msg);
+
+		return {
 			errorMsg: msg
 		};
 	}
