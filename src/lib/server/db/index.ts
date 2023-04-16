@@ -22,6 +22,12 @@ type QueryWrapper = {
 
 export type QueryResult<T> = { data: T } & QueryWrapper;
 
+export function getCustomerCount(): number {
+	const stmt = db.prepare(`SELECT COUNT(*) as "cnt" FROM customers`);
+	const data = stmt.get() as { cnt: number };
+	return data.cnt;
+}
+
 export function getCustomers({ offset = 0, limit = 50 }): QueryResult<Customer[]> {
 	const stmt = db.prepare(`
   SELECT CustomerID as "id"
@@ -40,6 +46,6 @@ export function getCustomers({ offset = 0, limit = 50 }): QueryResult<Customer[]
 
 	return {
 		data,
-		moreRows: data.length === limit
+		moreRows: getCustomerCount() > offset + limit
 	};
 }

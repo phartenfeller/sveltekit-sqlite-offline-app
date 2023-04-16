@@ -4,10 +4,12 @@ import {
 	type WorkerMessage,
 	type TableExistsResponseData,
 	type CreateTableResponseData,
-	type CreateTableRequestData
+	type CreateTableRequestData,
+	type FillStorageRequestData,
+	type FillStorageResponseData
 } from '../types';
 import { initDb } from './initDb';
-import { handleCreateTable, handleTableExists } from './storageHandlers';
+import { handleCreateTable, handleFillStorage, handleTableExists } from './storageHandlers';
 
 console.log('worker loaded');
 
@@ -61,6 +63,22 @@ function sendMsgToMain(obj: WorkerMessage<unknown>) {
 				};
 				sendMsgToMain(createTableResult);
 				break;
+
+			case WorkerMessageTypes.FILL_STORAGE:
+				const fillStorageData = await handleFillStorage(
+					data as WorkerMessage<FillStorageRequestData>
+				);
+
+				const fillStorageResult: WorkerMessage<FillStorageResponseData> = {
+					type: WorkerMessageTypes.FILL_STORAGE_RESPONSE,
+					messageId: data.messageId,
+					storageId: data.storageId,
+					data: fillStorageData
+				};
+
+				sendMsgToMain(fillStorageResult);
+				break;
+
 			default:
 				throw new Error(`Unknown message type: ${data.type}`);
 		}

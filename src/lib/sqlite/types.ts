@@ -6,8 +6,12 @@ export enum WorkerMessageTypes {
 	TABLE_EXISTS = 'TABLE_EXISTS',
 	TABLE_EXISTS_RESPONSE = 'TABLE_EXISTS_RESPONSE',
 	CREATE_TABLE = 'CREATE_TABLE',
-	CREATE_TABLE_RESPONSE = 'CREATE_TABLE_RESPONSE'
+	CREATE_TABLE_RESPONSE = 'CREATE_TABLE_RESPONSE',
+	FILL_STORAGE = 'FILL_STORAGE',
+	FILL_STORAGE_RESPONSE = 'FILL_STORAGE_RESPONSE'
 }
+
+export type DataRow = { [key: string]: string | number | boolean | null };
 
 export type WorkerMessageBase = {
 	messageId: string;
@@ -28,5 +32,14 @@ export type CreateTableRequestData = {
 };
 
 export type CreateTableResponseData = {
+	errorMsg?: string;
+};
+
+export type FillStorageRequestData = {
+	structure: TableStructure;
+	rows: DataRow[];
+};
+
+export type FillStorageResponseData = {
 	errorMsg?: string;
 };
