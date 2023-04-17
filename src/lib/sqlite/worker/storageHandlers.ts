@@ -68,9 +68,21 @@ export function handleFillStorage(
 		const src = genInsertSql(storageId, structure);
 		console.log('Insert sql:', src);
 
-		for (const row of rows) {
-			db.exec({ sql: src, bind: getBindObject(row) });
-		}
+		db.transaction(() => {
+			const stmnt = db.prepare(src);
+
+			for (const row of rows) {
+				try {
+					stmnt.bind(getBindObject(row));
+				} catch (err) {
+					console.error('Error binding row:', row);
+				} finally {
+					stmnt.stepReset();
+				}
+			}
+
+			stmnt.finalize();
+		});
 
 		return {};
 	} catch (err) {

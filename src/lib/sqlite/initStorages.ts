@@ -10,7 +10,7 @@ import {
 	type FillStorageResponseData
 } from './types';
 
-const storages = ['customers_v1'];
+const storages = ['customers_v1', 'order_details_v1'];
 
 async function getStructure(storage: string): Promise<TableStructure> {
 	const res = await fetch(`/api/data/${storage}/structure`);
@@ -36,6 +36,8 @@ async function createStorage(storage: string, structure: TableStructure) {
 }
 
 async function fillStorage(storage: string, structure: TableStructure) {
+	console.time(`fillStorage-${storage}`);
+
 	const PAGE_SIZE = 100;
 	let currOffset = 0;
 	let fetchMore = false;
@@ -59,6 +61,8 @@ async function fillStorage(storage: string, structure: TableStructure) {
 		currOffset += PAGE_SIZE;
 		fetchMore = moreRows;
 	} while (fetchMore);
+
+	console.timeEnd(`fillStorage-${storage}`);
 }
 
 export default async function initStorages() {
