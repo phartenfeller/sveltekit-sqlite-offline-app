@@ -6,8 +6,11 @@ import {
 	type CreateTableResponseData,
 	type CreateTableRequestData,
 	type FillStorageRequestData,
-	type FillStorageResponseData
+	type FillStorageResponseData,
+	type QueryRequestData,
+	type QueryResponseData
 } from '../types';
+import { handleQuery } from './handleQuery';
 import { initDb } from './initDb';
 import { handleCreateTable, handleFillStorage, handleTableExists } from './storageHandlers';
 
@@ -23,7 +26,7 @@ function sendMsgToMain(obj: WorkerMessage<unknown>) {
 
 		switch (data.type) {
 			case WorkerMessageTypes.INIT_DB:
-				await import('../jswasm/sqlite3.mjs');
+				await import('../jswasm/sqlite3-bundler-friendly.mjs');
 
 				const initRes = await initDb();
 				console.log('worker initDb result:', initRes);
@@ -77,6 +80,18 @@ function sendMsgToMain(obj: WorkerMessage<unknown>) {
 				};
 
 				sendMsgToMain(fillStorageResult);
+				break;
+
+			case WorkerMessageTypes.QUERY:
+				const queryData = await handleQuery(data as WorkerMessage<QueryRequestData>);
+				const queryResult: WorkerMessage<QueryResponseData> = {
+					type: WorkerMessageTypes.QUERY_RESPONSE,
+					messageId: data.messageId,
+					storageId: data.storageId,
+					data: queryData
+				};
+
+				sendMsgToMain(queryResult);
 				break;
 
 			default:

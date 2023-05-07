@@ -65,6 +65,33 @@ async function fillStorage(storage: string, structure: TableStructure) {
 	console.timeEnd(`fillStorage-${storage}`);
 }
 
+const readyStorages = new Set<string>();
+const storageCbs = new Map<string, (() => void)[]>();
+
+function storageIsReady(storageId: string) {
+	readyStorages.add(storageId);
+
+	if (storageCbs.has(storageId)) {
+		const cbs = storageCbs.get(storageId);
+		cbs?.forEach((cb) => cb());
+		storageCbs.delete(storageId);
+	}
+}
+
+export function waitTillStroageReady(storageId: string) {
+	return new Promise<void>((resolve) => {
+		if (readyStorages.has(storageId)) {
+			resolve();
+		} else {
+			if (!storageCbs.has(storageId)) {
+				storageCbs.set(storageId, [resolve]);
+			} else {
+				storageCbs.get(storageId)?.push(resolve);
+			}
+		}
+	});
+}
+
 export default async function initStorages() {
 	for (const storageId of storages) {
 		const res = (await sendMsgToWorker({
@@ -89,5 +116,7 @@ export default async function initStorages() {
 			await createStorage(storageId, structure);
 			await fillStorage(storageId, structure);
 		}
+
+		storageIsReady(storageId);
 	}
 }

@@ -8,7 +8,9 @@ export enum WorkerMessageTypes {
 	CREATE_TABLE = 'CREATE_TABLE',
 	CREATE_TABLE_RESPONSE = 'CREATE_TABLE_RESPONSE',
 	FILL_STORAGE = 'FILL_STORAGE',
-	FILL_STORAGE_RESPONSE = 'FILL_STORAGE_RESPONSE'
+	FILL_STORAGE_RESPONSE = 'FILL_STORAGE_RESPONSE',
+	QUERY = 'QUERY',
+	QUERY_RESPONSE = 'QUERY_RESPONSE'
 }
 
 export type DataRow = { [key: string]: string | number | boolean | null };
@@ -41,5 +43,14 @@ export type FillStorageRequestData = {
 };
 
 export type FillStorageResponseData = {
+	errorMsg?: string;
+};
+
+export type QueryRequestData = {
+	sql: string;
+};
+
+export type QueryResponseData = {
+	rows: DataRow[];
 	errorMsg?: string;
 };
