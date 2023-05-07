@@ -1,17 +1,17 @@
 <script lang="ts">
+	import type { Customer } from '$lib/server/db';
 	import { runQuery } from '$lib/sqlite/dataApi';
 	import { waitTillStroageReady } from '$lib/sqlite/initStorages';
 	import { onMount } from 'svelte';
 
 	let storageReady = false;
+	let customers: Customer[] = [];
 
 	onMount(async () => {
 		await waitTillStroageReady('customers_v1');
 		storageReady = true;
-		const data = await runQuery(`update customers_v1 set company = 'xyz' where 1 = 1`);
-		console.log(data);
-		const data2 = await runQuery('SELECT * FROM customers_v1 limit 10');
-		console.log(data2);
+		customers = (await runQuery('SELECT * FROM customers_v1 limit 10')) as Customer[];
+		console.log(customers);
 	});
 </script>
 
@@ -19,4 +19,12 @@
 
 <div>
 	Storage Ready: {storageReady ? 'true' : 'false'}
+</div>
+
+<div>
+	{#each customers as customer}
+		<div>
+			{customer.company}: Contact: {customer.contact} - {customer.phone}
+		</div>
+	{/each}
 </div>
