@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Customer } from '$lib/server/db';
-	import { runQuery } from '$lib/sqlite/dataApi';
+	import { runQuery, runStorageQuery } from '$lib/sqlite/dataApi';
 	import { waitTillStroageReady } from '$lib/sqlite/initStorages';
 	import { onMount } from 'svelte';
 
@@ -10,7 +10,11 @@
 	onMount(async () => {
 		await waitTillStroageReady('customers_v1');
 		storageReady = true;
-		customers = (await runQuery('SELECT * FROM customers_v1 limit 10')) as Customer[];
+		customers = (await runStorageQuery('customers_v1', {
+			orderByCol: 'contact',
+			orderByDir: 'desc',
+			searchTerm: 'Paul'
+		})) as Customer[];
 		console.log(customers);
 	});
 </script>

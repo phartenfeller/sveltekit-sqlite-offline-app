@@ -10,7 +10,9 @@ export enum WorkerMessageTypes {
 	FILL_STORAGE = 'FILL_STORAGE',
 	FILL_STORAGE_RESPONSE = 'FILL_STORAGE_RESPONSE',
 	QUERY = 'QUERY',
-	QUERY_RESPONSE = 'QUERY_RESPONSE'
+	QUERY_RESPONSE = 'QUERY_RESPONSE',
+	QUERY_STORAGE = 'QUERY_STORAGE',
+	QUERY_STORAGE_RESPONSE = 'QUERY_STORAGE_RESPONSE'
 }
 
 export type DataRow = { [key: string]: string | number | boolean | null };
@@ -51,6 +53,21 @@ export type QueryRequestData = {
 };
 
 export type QueryResponseData = {
+	rows: DataRow[];
+	errorMsg?: string;
+};
+
+export type OrderByDir = 'asc' | 'desc';
+
+export type QueryStorageRequestData = {
+	offset?: number;
+	limit?: number;
+	orderByCol?: string;
+	orderByDir?: OrderByDir;
+	searchTerm?: string;
+};
+
+export type QueryStorageResponseData = {
 	rows: DataRow[];
 	errorMsg?: string;
 };

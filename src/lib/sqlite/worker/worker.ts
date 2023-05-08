@@ -8,9 +8,10 @@ import {
 	type FillStorageRequestData,
 	type FillStorageResponseData,
 	type QueryRequestData,
-	type QueryResponseData
+	type QueryResponseData,
+	type QueryStorageRequestData
 } from '../types';
-import { handleQuery } from './handleQuery';
+import { handleQuery, handleStorageQuery } from './handleQuery';
 import { initDb } from './initDb';
 import { handleCreateTable, handleFillStorage, handleTableExists } from './storageHandlers';
 
@@ -92,6 +93,20 @@ function sendMsgToMain(obj: WorkerMessage<unknown>) {
 				};
 
 				sendMsgToMain(queryResult);
+				break;
+
+			case WorkerMessageTypes.QUERY_STORAGE:
+				const queryStorageData = await handleStorageQuery(
+					data as WorkerMessage<QueryStorageRequestData>
+				);
+				const queryStorageResult: WorkerMessage<QueryResponseData> = {
+					type: WorkerMessageTypes.QUERY_STORAGE_RESPONSE,
+					messageId: data.messageId,
+					storageId: data.storageId,
+					data: queryStorageData
+				};
+
+				sendMsgToMain(queryStorageResult);
 				break;
 
 			default:
